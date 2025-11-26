@@ -1,0 +1,53 @@
+{% extends 'todos/base.html' %}
+{% block title %}My TODOs{% endblock %}
+
+{% block content %}
+<h1>My TODO List</h1>
+
+<a href="{% url 'todo_create' %}" class="btn btn-primary">+ Add New TODO</a>
+
+<ul class="list-unstyled mt-4">
+    {% if todos %}
+        {% for todo in todos %}
+            <li class="mb-3">
+                <div class="card">
+                    <div class="card-body">
+                        <h3>{{ todo.title }}</h3>
+                        {% if todo.description %}
+                            <p>{{ todo.description }}</p>
+                        {% endif %}
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                {% if todo.status == 'resolved' %}
+                                    <span class="badge badge-success">Resolved</span>
+                                {% endif %}
+                                {% if todo.due_date %}
+                                    {% if todo.is_overdue %}
+                                        <span class="badge badge-danger">⚠ Overdue: {{ todo.due_date }}</span>
+                                    {% else %}
+                                        <span>Due: {{ todo.due_date }}</span>
+                                    {% endif %}
+                                {% endif %}
+                            </div>
+                            <div>
+                                <form method="post" action="{% url 'todo_toggle_status' todo.pk %}" style="display: inline;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-link">Toggle</button>
+                                </form>
+                                <a href="{% url 'todo_edit' todo.pk %}" class="btn btn-primary btn-sm">Edit</a>
+                                <a href="{% url 'todo_delete' todo.pk %}" class="btn btn-danger btn-sm">Delete</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </li>
+        {% endfor %}
+    {% else %}
+        <div class="no-todos">
+            <h2>No TODOs yet!</h2>
+            <p>Click "Add New TODO" to get started.</p>
+        </div>
+    {% endif %}
+</ul>
+
+{% endblock %}
